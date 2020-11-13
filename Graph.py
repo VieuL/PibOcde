@@ -1,16 +1,15 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 class Graph:
     def __init__(self, df):
         self.df = df
-        self.legend = []
-        self.fig, self.ax = plt.subplots(figsize=(30,5))
+        self.fig = None
 
     def filter_df(self, location, frequency, subject, measure, time=[]):
         df = self.df
-        df = df[df['LOCATION'] == location]
+        df = df[df['LOCATION'].isin(location)]
         df = df[df['FREQUENCY'] == frequency]
         df = df[df['SUBJECT'] == subject]
         df = df[df['MEASURE'] == measure]
@@ -26,46 +25,22 @@ class Graph:
                 list_time.append(str(t)+"-Q"+str(q))
         return list_time
 
-    def get_df_dates(self, df):
-        dates = list()
-        for index, row in df.iterrows():
-            dates.append(row['TIME'])
-        return dates
+    def line_graph(self, df, x, y, x_label='', y_label='', title='', color='LOCATION', legend_title='Pays', height=400, width=1500):
+        self.fig = px.line(df, x=x, y=y, color=color, height=height, width=width)
+        self.fig.update_traces(mode="lines", hovertemplate=None)
+        self.fig.update_layout(
+            xaxis_title=x_label,
+            yaxis_title=y_label,
+            legend_title=legend_title,
+            title = {
+                'text': "Evolution du PIB",
+                'y':0.9,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'
+            },
+            hovermode="x unified"
+            )
 
-    def plot_graph(self, df, color):
-        values = list()
-        self.legend.append(df.iloc[0]['LOCATION'])
-
-        for index, row in df.iterrows():
-            values.append(row['Value'])
-
-        self.ax.plot(range(len(df)), values, color = color)
-
-    def define_xticks2(self, labels, nbins):
-
-        final_labels = list()
-        inter = len(labels)%nbins
-        print(inter)
-        for label in labels:
-            if labels.index(label)%inter == 0:
-                final_labels.append(label)
-        return final_labels
-
-    def define_xticks(self, labels, nbins):
-        final_labels = list()
-        indexes = np.arange(0, len(labels), nbins)
-        for index in indexes:
-            final_labels.append(labels[index])
-
-        return final_labels
-
-
-    def display(self, dates, nbins):
-        plt.xlabel("Trimestre")
-        plt.ylabel("Croissance du PIB (%)")
-        ticks = self.define_xticks(dates, nbins)
-        plt.locator_params(axis='x', nbins=nbins)
-        plt.xticks(np.arange(len(ticks)), ticks, rotation='vertical')
-        plt.legend(self.legend)
-
-        plt.show()
+    def display(self):
+        self.fig.show()
