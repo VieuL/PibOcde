@@ -29,8 +29,8 @@ def mobilMoy(data, fenetre):
                     # print(str(µ - (i+1)) + " et " + str(µ + (i+1)) + " pour " + str(µ))
                     inter.append(data.iloc[µ - (i + 1)]['Value'])
                     inter.append(data.iloc[µ + (i + 1)]['Value'])
-                    valM.append([data.iloc[µ].name, np.mean(inter)])
-                    valV.append([data.iloc[µ].name, np.var(inter)])
+                valM.append([data.iloc[µ].name, data.iloc[µ]['TIME'], np.mean(inter)])
+                valV.append([data.iloc[µ].name, data.iloc[µ]['TIME'], np.var(inter)])
                     # print('\n')
 
     else:
@@ -42,8 +42,8 @@ def mobilMoy(data, fenetre):
                     # print(str(µ - (i+1)) + " et " + str(µ + (i+1)) + " pour " + str(µ))
                     inter.append(data.iloc[µ - (i + 1)]['Value'])
                     inter.append(data.iloc[µ + (i + 1)]['Value'])
-                valM.append([data.iloc[µ].name, np.mean(inter)])
-                valV.append([data.iloc[µ].name, np.var(inter)])
+                valM.append([data.iloc[µ].name,  data.iloc[µ]['TIME'], np.mean(inter)])
+                valV.append([data.iloc[µ].name,  data.iloc[µ]['TIME'], np.var(inter)])
     return valM, valV
 
 
