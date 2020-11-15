@@ -56,3 +56,29 @@ def traitementParPays(data, F):
     return chgpy, chgpp, indice
 
 
+def saisonier(data):
+    gpy, gppQ, ind = traitementParPays(data, 'Q')
+    dataQ1 = []
+    dataQ2 = []
+    dataQ3 = []
+    dataQ4 = []
+    for µ in range(len(gppQ)):
+        if 'Q1' in gppQ.iloc[µ]['TIME']:
+            dataQ1.append([gppQ.iloc[µ]['TIME'].split('-')[0], gppQ.iloc[µ]['Value']])
+        elif 'Q2' in gppQ.iloc[µ]['TIME']:
+            dataQ2.append([gppQ.iloc[µ]['TIME'].split('-')[0], gppQ.iloc[µ]['Value']])
+        elif 'Q3' in gppQ.iloc[µ]['TIME']:
+            dataQ3.append([gppQ.iloc[µ]['TIME'].split('-')[0], gppQ.iloc[µ]['Value']])
+        elif 'Q4' in gppQ.iloc[µ]['TIME']:
+            dataQ4.append([gppQ.iloc[µ]['TIME'].split('-')[0], gppQ.iloc[µ]['Value']])
+    # %%
+    dataQ1 = pd.DataFrame(dataQ1, columns=['Annee', 'ValeurQ1'])
+    dataQ2 = pd.DataFrame(dataQ2, columns=['Annee', 'ValeurQ2'])
+    dataQ3 = pd.DataFrame(dataQ3, columns=['Annee', 'ValeurQ3'])
+    dataQ4 = pd.DataFrame(dataQ4, columns=['Annee', 'ValeurQ4'])
+
+    dataTrim = pd.merge(dataQ1, dataQ2)
+    dataTrim = pd.merge(dataTrim, dataQ3)
+    dataTrim = pd.merge(dataTrim, dataQ4)
+
+    return dataTrim
