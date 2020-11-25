@@ -2,7 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot  as plt
 import numpy as np
-
+from Graph import Graph
 
 def mobilMoy(data, fenetre):
     '''
@@ -29,8 +29,8 @@ def mobilMoy(data, fenetre):
                     # print(str(µ - (i+1)) + " et " + str(µ + (i+1)) + " pour " + str(µ))
                     inter.append(data.iloc[µ - (i + 1)]['Value'])
                     inter.append(data.iloc[µ + (i + 1)]['Value'])
-                valM.append([data.iloc[µ].name, data.iloc[µ]['TIME'], np.mean(inter)])
-                valV.append([data.iloc[µ].name, data.iloc[µ]['TIME'], np.var(inter)])
+                valM.append(['moyenne mobille ' + str(fenetre), data.iloc[µ]['TIME'], np.mean(inter)])
+                valV.append(['moyenne-mobille ' + str(fenetre), data.iloc[µ]['TIME'], np.var(inter)])
                     # print('\n')
 
     else:
@@ -42,8 +42,9 @@ def mobilMoy(data, fenetre):
                     # print(str(µ - (i+1)) + " et " + str(µ + (i+1)) + " pour " + str(µ))
                     inter.append(data.iloc[µ - (i + 1)]['Value'])
                     inter.append(data.iloc[µ + (i + 1)]['Value'])
-                valM.append([data.iloc[µ].name,  data.iloc[µ]['TIME'], np.mean(inter)])
-                valV.append([data.iloc[µ].name,  data.iloc[µ]['TIME'], np.var(inter)])
+                    # data.iloc[µ].name
+                valM.append(['moyenne-mobille '+ str(fenetre),  data.iloc[µ]['TIME'], np.mean(inter)])
+                valV.append(['moyenne-mobille '+ str(fenetre),  data.iloc[µ]['TIME'], np.var(inter)])
     return valM, valV
 
 
@@ -82,3 +83,32 @@ def saisonier(data):
     dataTrim = pd.merge(dataTrim, dataQ4)
 
     return dataTrim
+
+def affichageMoyenneM(data,ordre,per):
+    g = Graph(data)
+
+    if per == 'A':
+        lDate = []
+        for µ in range(1961, 2021):
+            lDate.append(str(µ))
+        # gpy, gpp, ind = tr.traitementParPays(dataFR, 'A')
+        gpp = g.filter_df(['FRA'],'A','TOT','PC_CHGPP',lDate)
+        data = pd.DataFrame(columns=['LOCATION', 'TIME', 'Value'])
+        for µ in ordre:
+            moy = pd.DataFrame(mobilMoy(gpp,µ)[0],columns=['LOCATION','TIME','Value'])
+            data = pd.concat([data,moy])
+        g.line_graph(pd.concat([data,gpp]), x='TIME', y='Value', x_label="Trimestre", y_label="Croissance du PIB (%)",
+                     title='Evolution du pib')  # Création des courbes
+        g.display()
+
+    if per == 'Q':
+        lDate = g.get_list_dates_q(1961,2021)
+        gpp = g.filter_df(['FRA'],'Q','TOT','PC_CHGPP',lDate)
+        r = gpp
+        data = pd.DataFrame(columns=['LOCATION', 'TIME', 'Value'])
+        for µ in ordre:
+            moy = pd.DataFrame(mobilMoy(gpp,µ)[0],columns=['LOCATION','TIME','Value'])
+            data = pd.concat([data,moy])
+        g.line_graph(pd.concat([r,data]), x='TIME', y='Value', x_label="Trimestre", y_label="Croissance du PIB (%)",
+                     title='Evolution du pib')  # Création des courbes
+        g.display()
