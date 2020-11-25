@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.figure_factory as ff
+
 
 class Graph:
     def __init__(self, df):
@@ -18,7 +20,7 @@ class Graph:
             df = df[df['TIME'].isin(time)]
         return df
 
-    def get_list_dates(self, start, end):
+    def get_list_dates_q(self, start, end):
         list_time = list()
         for t in range(start, end):
             for q in range(1, 5):
@@ -40,7 +42,36 @@ class Graph:
                 'yanchor': 'top'
             },
             hovermode="x unified"
-            )
+        )
+
+    def display_correlation_heatmap(self):
+        countries = ["ZAF", "DEU", "AUS", "AUT", "CAN", "ESP", "USA", "FRA", "GBR", "ITA", "JPN", "CHE"]
+
+        corrMatrix = []
+        dates = self.get_list_dates_q(1980, 2019)
+
+        country_corr = []
+        for country in countries:
+            country_corr = []
+            ref_country = self.filter_df([country], 'Q', 'TOT', 'PC_CHGPY', dates)['Value'].to_numpy()
+
+            for c in countries:
+                c_df = self.filter_df([c], 'Q', 'TOT', 'PC_CHGPY', dates)['Value'].to_numpy()
+                corr = np.corrcoef(ref_country, c_df)
+
+                country_corr.append(np.round(corr[0, 1], 3))
+
+            corrMatrix.append(country_corr)
+
+        fig = ff.create_annotated_heatmap(corrMatrix[::-1],
+            x=countries,
+            y=countries[::-1],
+            colorscale='YlGnBu'
+        )
+
+        fig.update_layout(title_text="Corrélation entre le PIB des différents membres de l'OCDE")
+
+        fig.show()
 
     def display(self):
         self.fig.show()
