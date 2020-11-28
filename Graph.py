@@ -35,7 +35,7 @@ class Graph:
             yaxis_title=y_label,
             legend_title=legend_title,
             title = {
-                'text': "Evolution du PIB",
+                'text': title,
                 'y':0.9,
                 'x':0.5,
                 'xanchor': 'center',
@@ -44,24 +44,31 @@ class Graph:
             hovermode="x unified"
         )
 
-    def display_correlation_heatmap(self):
-        countries = ["ZAF", "DEU", "AUS", "AUT", "CAN", "ESP", "USA", "FRA", "GBR", "ITA", "JPN", "CHE"]
-
+    def correlation(self, dates, countries=[], frequency='Q', measure='PC_CHGPY'):
         corrMatrix = []
-        dates = self.get_list_dates_q(1980, 2019)
-
         country_corr = []
+
         for country in countries:
             country_corr = []
-            ref_country = self.filter_df([country], 'Q', 'TOT', 'PC_CHGPY', dates)['Value'].to_numpy()
+            ref_country = self.filter_df([country], frequency, 'TOT', measure, dates)['Value'].to_numpy()
 
             for c in countries:
-                c_df = self.filter_df([c], 'Q', 'TOT', 'PC_CHGPY', dates)['Value'].to_numpy()
+                c_df = self.filter_df([c], frequency, 'TOT', measure, dates)['Value'].to_numpy()
                 corr = np.corrcoef(ref_country, c_df)
 
-                country_corr.append(np.round(corr[0, 1], 3))
+                country_corr.append(np.abs(np.round(corr[0, 1], 3)))
 
             corrMatrix.append(country_corr)
+
+        return corrMatrix
+
+
+    def display_correlation_heatmap(self, dates, countries=[]):
+        countries_title = ""
+        for country in countries:
+            countries_title += country + ", "
+
+        corrMatrix = self.correlation(dates, countries)
 
         fig = ff.create_annotated_heatmap(corrMatrix[::-1],
             x=countries,
@@ -69,9 +76,25 @@ class Graph:
             colorscale='YlGnBu'
         )
 
-        fig.update_layout(title_text="Corrélation entre le PIB des différents membres de l'OCDE")
+        fig.update_layout(title_text="Corrélation entre le PIB de "+countries_title[:len(countries_title)-2])
 
         fig.show()
+
+
+    def display_correlation_line(self, dates, countries=[]):
+        corrMatrix = list()
+        pd_dates = list()
+
+        for i in range(8, len(dates), 8):
+            temp_dates=dates[i-8:i]  
+            pd_dates.append("-".join([temp_dates[0].split('-')[0], temp_dates[::-1][0].split('-')[0]]))
+
+            corr = self.correlation(temp_dates, countries, frequency='Q', measure='PC_CHGPY')
+            corrMatrix.append(corr[0][1])
+
+        pd_corr = pd.DataFrame(list(zip(["-".join(countries)]*len(corrMatrix), pd_dates, corrMatrix)), columns=['LOCATION', 'TIME', 'Value'])
+
+        return pd_corr
 
     def display(self):
         self.fig.show()
