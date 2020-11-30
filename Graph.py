@@ -89,7 +89,7 @@ class Graph:
             temp_dates=dates[i-8:i]  
             pd_dates.append("-".join([temp_dates[0].split('-')[0], temp_dates[::-1][0].split('-')[0]]))
 
-            corr = self.correlation(temp_dates, countries, frequency='Q', measure='PC_CHGPY')
+            corr = self.correlation(temp_dates, countries, frequency='Q', measure='PC_CHGPP')
             corrMatrix.append(corr[0][1])
 
         pd_corr = pd.DataFrame(list(zip(["-".join(countries)]*len(corrMatrix), pd_dates, corrMatrix)), columns=['LOCATION', 'TIME', 'Value'])
