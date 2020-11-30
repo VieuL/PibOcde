@@ -84,7 +84,7 @@ def saisonier(data):
 
     return dataTrim
 
-def affichageMoyenneM(data,ordre,per):
+def affichageMoyenneM(data, country, ordre, per):
     g = Graph(data)
 
     if per == 'A':
@@ -92,23 +92,26 @@ def affichageMoyenneM(data,ordre,per):
         for µ in range(1961, 2021):
             lDate.append(str(µ))
         # gpy, gpp, ind = tr.traitementParPays(dataFR, 'A')
-        gpp = g.filter_df(['FRA'],'A','TOT','PC_CHGPP',lDate)
+        gpp = g.filter_df([country],'A','TOT','PC_CHGPP',lDate)
         data = pd.DataFrame(columns=['LOCATION', 'TIME', 'Value'])
         for µ in ordre:
             moy = pd.DataFrame(mobilMoy(gpp,µ)[0],columns=['LOCATION','TIME','Value'])
             data = pd.concat([data,moy])
-        g.line_graph(pd.concat([data,gpp]), x='TIME', y='Value', x_label="Trimestre", y_label="Croissance du PIB (%)",
-                     title='Evolution du pib')  # Création des courbes
+        g.line_graph(pd.concat([data,gpp]), x='TIME', y='Value', x_label="Trimestre", y_label="Evolution du PIB (%)",
+                     title='Evolution du PIB au cours du temps')  # Création des courbes
         g.display()
 
     if per == 'Q':
         lDate = g.get_list_dates_q(1961,2021)
-        gpp = g.filter_df(['FRA'],'Q','TOT','PC_CHGPP',lDate)
+        gpp = g.filter_df([country],'Q','TOT','PC_CHGPP',lDate)
         r = gpp
         data = pd.DataFrame(columns=['LOCATION', 'TIME', 'Value'])
         for µ in ordre:
             moy = pd.DataFrame(mobilMoy(gpp,µ)[0],columns=['LOCATION','TIME','Value'])
             data = pd.concat([data,moy])
-        g.line_graph(pd.concat([r,data]), x='TIME', y='Value', x_label="Trimestre", y_label="Croissance du PIB (%)",
-                     title='Evolution du pib')  # Création des courbes
+        g.line_graph(pd.concat([r,data]), x='TIME', y='Value', x_label="Trimestre", y_label="Evoltion du PIB (%)",
+                     title='Evolution du pib au cours du temps')  # Création des courbes
         g.display()
+
+
+        
