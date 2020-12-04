@@ -10,6 +10,14 @@ class Graph:
         self.fig = None
 
     def filter_df(self, location, frequency, subject, measure, time=[]):
+        """
+            params :
+                location, time : list
+                frequency, subject, measure : string
+            
+            Filtre le dataframe en fonction des paramètres passés
+            Return DataFrame
+        """
         df = self.df
         df = df[df['LOCATION'].isin(location)]
         df = df[df['FREQUENCY'] == frequency]
@@ -21,6 +29,13 @@ class Graph:
         return df
 
     def get_list_dates_q(self, start, end):
+        """
+            params :
+                start, end : string
+
+            Retourne l'ensemble des trimestres entre deux années données    
+            Return list
+        """
         list_time = list()
         for t in range(start, end):
             for q in range(1, 5):
@@ -28,6 +43,9 @@ class Graph:
         return list_time
 
     def line_graph(self, df, x, y, x_label='', y_label='', title='', color='LOCATION', legend_title='Pays', height=400, width=1500):
+        """
+            Génère un line graph à partir des paramètres passés
+        """
         self.fig = px.line(df, x=x, y=y, color=color, height=height, width=width)
         self.fig.update_traces(mode="lines", hovertemplate=None)
         self.fig.update_layout(
@@ -45,6 +63,17 @@ class Graph:
         )
 
     def correlation(self, dates, countries=[], frequency='Q', measure='PC_CHGPY'):
+        """
+            params :
+                dates : list
+                countries : list
+                frequency : string
+                measure :
+
+            Détermine la matrice de correlation pour l'ensemble des pays passés en paramètres
+
+            Return list
+        """
         corrMatrix = []
         country_corr = []
 
@@ -64,6 +93,13 @@ class Graph:
 
 
     def display_correlation_heatmap(self, dates, countries=[]):
+        """
+            params :
+                dates : list
+                countries : list
+
+            Affiche la matrice de corrélation pour les pays et dates passés en paramètres
+        """
         countries_title = ""
         for country in countries:
             countries_title += country + ", "
